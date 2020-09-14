@@ -1,0 +1,11 @@
+{
+    "python.pythonPath": "C:\\Users\\Mai-AbdEltwab\\Anaconda3\\python.exe",
+    "python.linting.pylintArgs": [
+        "--load-plugins=pylint_django",
+        "--generated-members=numpy.* ,torch.*",
+        "--extension-pkg-whitelist=numpy"
+    ],
+    "python.linting.enabled": true,
+    "python.linting.pylintUseMinimalCheckers": true,
+}
+
