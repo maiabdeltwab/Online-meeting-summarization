@@ -1,0 +1,96 @@
+﻿{% extends "app/layout.html" %} {% load static %} {% load group_user_filter %} {% block content %}
+<div class="profile-page">
+    <div class="squares square11"></div>
+    <div class="squares square22"></div>
+    <div class="squares square4"></div>
+    <div class="squares square5"></div>
+
+    <div class="">
+        <div class="page-header header-filter">
+            <div class="content p-t-120">
+                <span class="h2"><i class="mdi mdi-account-multiple-plus p-r-15 text-danger"></i>
+                <span class="text-info">Add memebers to: </span><span class="text-dark">{{group.name}}</span></span>
+                <div class="row m-t-20">
+                    <div class="col-md-7 ml-auto col-xl-7 mr-auto">
+                        <div class="card shadow mb-4 justify-content-center" align="center">
+                            <div class="card-header">
+                                <form action="." method="post" class="">
+                                    {% csrf_token %}
+                                    <input type="hidden" id="searchUser" name="search_user" value="false">
+                                    <div class="input-group">
+                                        {{ form.search_text }}
+                                        <div class="input-group-append">
+                                            <button class="btn btn-info m-t-13" type="submit" id="search">
+                                              <i class="fa fa-search"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            <hr> {% for user_search in users %} {% if user_search.id != user.id %}
+                            <div class="row p-l-45">
+                                <div class="col-lg-9">
+                                    <a class="dropdown-item d-flex align-items-center m-b-20" href="{% url 'profile' user_search.username %}">
+                                        <div class="icon-circle mr-3">
+                                            {% if user_search.user_profile.pic_path %}
+                                            <img class="img-profile rounded-circle" src="{{ user_search.user_profile.pic_path.url  }}" alt="user image" width="50" height="50"> {% else %}
+                                            <img class="img-profile rounded-circle" src="{% static 'imgs/default_user_pic.png' %}" alt="user image" width="50" height="50"> {% endif %}
+                                        </div>
+                                        <div>
+                                            <span class="font-weight-bold text-info">{{user_search.first_name}} {{user_search.last_name}}</span>
+                                            <span class="text-black-50">@{{user_search.username}}</span>
+                                        </div>
+                                    </a>
+                                </div>
+                                {% if group|has_user:user_search.id %}
+                                <form action="{% url 'addGroupMember' group.id user_search.id %}" method="post">
+                                    {% csrf_token %}
+                                    <input type="hidden" id="removeUser" name="remove_user" value="false">
+                                    <button type="submit" class="btn btn-warning" id="remove">remove</button>
+                                </form>
+                                {% else %}
+                                <form action="{% url 'addGroupMember' group.id user_search.id %}" method="post">
+                                    {% csrf_token %}
+                                    <input type="hidden" id="addUser" name="add_user" value="false">
+                                    <button type="submit" class="btn" id="add"> <span class="m-l-10 m-r-10">Add</span>  </button>
+                                </form>
+                                {% endif %}
+                            </div>
+                            {% endif %} {% endfor %}
+                            <div class=" m-b-40 m-t-20">
+                                <a class="btn btn-success col-lg-6" href="{% url 'viewGroup' group.id %}">
+                                  finish
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="main">
+            <div class="section section-basic m-b-100 " id="basic-elements ">
+                <div class="content ">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} {% block scripts %}
+<script>
+    $('#search').click(function() {
+        $('#searchUser').val('true');
+    });
+</script>
+
+<script>
+    $('#add').click(function() {
+        $('#addUser').val('true');
+    });
+</script>
+
+<script>
+    $('#remove').click(function() {
+        $('#removeUser').val('true');
+    });
+</script>
+{% endblock %}

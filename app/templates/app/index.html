@@ -1,0 +1,28 @@
+{% extends "app/layout.html" %} {% load static %} {% load staticfiles %} {% block content %}
+<div class="index-page">
+    <div class="page-header header-filter">
+        <div class="squares square1"></div>
+        <div class="squares square2"></div>
+        <div class="squares square3"></div>
+        <div class="squares square4"></div>
+        <div class="squares square5"></div>
+        <div class="squares square7"></div>
+
+        <div class="container">
+            <div class="row">
+                <div class="brand col-md-6 p-t-210">
+                    <h1 class="h1-seo text-default">Meetapp•</h1>
+                    <h3 class="text-default">Smart meeting application.</h3>
+                    {% if not user.is_authenticated %}
+                    <a class="btn btn-info btn-round" type="button" href="{% url 'signup' %}">Register</a>
+                    <a class="btn btn-primary btn-simple btn-round" type="button" href="{% url 'login' %}">login</a>
+                    {% endif %}
+                </div>
+                <div class="col-md-6 p-t-150">
+                    <img src="{% static 'imgs/homepage2.png' %}" alt="">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

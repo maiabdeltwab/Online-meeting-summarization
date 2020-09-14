@@ -1,0 +1,134 @@
+﻿{% extends "app/layout.html" %} {% load static %} {% block content %}
+
+<div class="profile-page">
+    <div class="squares square11"></div>
+    <div class="squares square22"></div>
+    <div class="squares square4"></div>
+    <div class="squares square5"></div>
+    <div class="">
+        <div class="page-header header-filter">
+            <div class="content p-t-120">
+                <span class="text-danger h2">Group meetings</span>
+                <div class="row m-t-20">
+                    <div class="col-md-11 ml-auto col-xl-11 mr-auto">
+                        {% if calls %}
+                        <div class="card shadow">
+                            <div class="card-body">
+                                <div class="table-responsive-">
+                                    <table class="table table-bordered" id="audioTable" width="100%" cellspacing="0">
+                                        <thead class="bg-info">
+                                            <tr>
+                                                <th>Tilte</th>
+                                                <th>group</th>
+                                                <th>date</th>
+                                                <th>state</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for call in calls %}
+                                            <tr>
+                                                {% if call.state == 3 %}
+                                                <td>
+                                                    <a class="account-heading text-dark" href="{% url 'group_meeting' call.id %}">{{call.title}}</a>
+                                                </td>
+                                                {% else %}
+                                                <td>
+                                                    <label class="account-heading text-dark">{{call.title}}</label>
+                                                </td>
+                                                {% endif %}
+                                                <td>
+                                                    <a class="account-heading text-black-50" href="{% url 'viewGroup' call.group.id %}">{{call.group.name}}</a>
+                                                </td>
+
+                                                <td><label class="account-heading text-black-50">{{call.call_date}}</label></td>
+
+                                                <td>
+                                                    {% if call.state == 0 %}
+                                                    <div class="spinner-border spinner-border-sm text-danger" role="status">
+                                                        <span class="sr-only">Loading...</span>
+                                                    </div>
+                                                    <span class="text-black-50">uploading </span> {% elif call.state == 1 %}
+                                                    <div class="spinner-border spinner-border-sm text-primary" role="status">
+                                                        <span class="sr-only">Loading...</span>
+                                                    </div>
+                                                    <span class="text-black-50">speech recognition </span> {% elif call.state == 2 %}
+                                                    <div class="spinner-border spinner-border-sm text-warning" role="status">
+                                                        <span class="sr-only">Loading...</span>
+                                                    </div>
+                                                    <span class="text-black-50">summarize </span> {% elif call.state == 3 %}
+                                                    <i class="mdi mdi-check-all text-success"></i>
+                                                    <span class="text-black-50">complete</span> {% endif %}
+                                                </td>
+
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        {% else %}
+                        <div class="container-fluid">
+                            <p class="lead text-gray-800 mb-5">There is no uploaded meeting yet...</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="main">
+            <div class="section section-basic m-b-100 " id="basic-elements">
+                <div class="content ">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %} {% block scripts %}
+<script src="{% static 'bootstrap/vendor/chart.js/Chart.min.js' %}"></script>
+<script src="{% static 'bootstrap/vendor/datatables/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'bootstrap/vendor/datatables/dataTables.bootstrap4.min.js' %}"></script>
+
+<!-- Pages level custom scripts -->
+<script src="{% static 'bootstrap/js/demo/chart-area-demo.js' %}"></script>
+<script src="{% static 'bootstrap/js/demo/chart-pie-demo.js' %}"></script>
+<script>
+    $(document).ready(function() {
+        $('#audioTable').DataTable({
+            "order": [
+                [2, "desc"]
+            ],
+            destroy: true,
+        });
+    });
+</script>
+<script>
+    $('#audioTable').change(function() {
+        $('#audioTable').destroy();
+        $('#audioTable').DataTable({
+            "order": [
+                [2, "desc"]
+            ]
+        });
+    });
+</script>
+<script>
+    var append_increment = 0;
+    setInterval(function() {
+        $.ajax({
+            type: "GET",
+            url: 'refresh',
+            data: {
+                'append_increment': append_increment
+            }
+        })
+
+        .done(function(response) {
+            $('#audioTable tbody').empty();
+            $('#audioTable').append(response);
+            append_increment += 1
+        });
+    }, 1000)
+</script>
+{% endblock %}

@@ -1,0 +1,97 @@
+﻿{% extends "app/layout.html" %} {% load static %} {% load staticfiles %} {% block content %}
+
+<div class="index-page">
+    <div class="page-header header-filter">
+        <div class="squares square11"></div>
+        <div class="squares square22"></div>
+        <div class="squares square3"></div>
+        <div class="squares square4"></div>
+        <div class="squares square5"></div>
+        <div class="squares square7"></div>
+
+        <div class="container p-t-60">
+            <div class="p-0" style="z-index:100;">
+                <!-- Nested Row within Card Body -->
+                <div class="row">
+                    <div class="col-lg-6 d-none d-lg-block p-t-80 p-r-60"><img src="{% static '/imgs/register.png'%}" alt=""></div>
+                    <div class="card o-hidden border-0 shadow-lg my-5 col-lg-6">
+                        <div class="card-body">
+                            <div class="p-5">
+                                <div class="text-center">
+                                    <h1 class="h4 text-danger mb-4">Create new Account!</h1>
+                                </div>
+                                <form class="user" method="post">
+                                    {% csrf_token %} {% if form.username.errors %}
+                                    <div class="form-group has-danger" rel="tooltip" title="A user with that username already exists.">
+                                        {{ form.username }}
+                                    </div>
+                                    {% else %}
+                                    <div class="form-group">
+                                        {{ form.username }}
+                                    </div>
+                                    {% endif %}
+                                    <div class="form-group row">
+                                        <div class="col-sm-6 mb-3 mb-sm-0">
+                                            {{ form.first_name }}
+                                        </div>
+                                        <div class="col-sm-6">
+                                            {{ form.last_name }}
+                                        </div>
+                                    </div>
+                                    {% if "Enter a valid email address." in form.email.errors %}
+                                    <div class="form-group has-danger" rel="tooltip" title="Enter a valid email address.">
+                                        {{ form.email }}
+                                    </div>
+                                    {% elif "User with this Email address already exists." in form.email.errors %}
+                                    <div class="form-group has-danger" rel="tooltip" title="User with this Email address already exists.">
+                                        {{ form.email }}
+                                    </div>
+                                    {% else %}
+                                    <div class="form-group">
+                                        {{ form.email }}
+                                    </div>
+                                    {% endif %} {% if form.password2.errors %}
+                                    <div class="form-group row has-danger">
+                                        <div class="col-sm-6 mb-3 mb-sm-0" rel="tooltip" title="The two password fields didn't match">
+                                            {{ form.password1 }}
+                                        </div>
+                                        <div class="col-sm-6" data-toggle="tooltip" title="The two password fields didn't match">
+                                            {{ form.password2 }}
+                                        </div>
+                                    </div>
+                                    {% else %}
+                                    <div class="form-group row">
+                                        <div class="col-sm-6 mb-3 mb-sm-0">
+                                            {{ form.password1 }}
+                                        </div>
+                                        <div class="col-sm-6">
+                                            {{ form.password2 }}
+                                        </div>
+                                    </div>
+                                    {% endif %}
+
+                                    <input type="submit" value="Register Account" class="btn btn-info btn-user btn-block" />
+                                    <hr>
+
+                                    <a href="{% url 'social:begin' 'google-oauth2' %}" class="btn btn-danger btn-user btn-block">
+                                        <i class="fab fa-google fa-fw"></i> Register with Google
+                                    </a>
+                                    <a href="{% url 'social:begin' 'facebook' %}" class="btn btn-facebook btn-user btn-block">
+                                        <i class="fab fa-facebook-f fa-fw"></i> Register with Facebook
+                                    </a>
+                                </form>
+                                <hr>
+
+                                <div class="text-center">
+                                    <a class="small" href="{% url 'login' %}">Already have an account? Login!</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
