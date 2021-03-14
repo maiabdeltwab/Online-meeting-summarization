@@ -1,0 +1,1 @@
+{"segment_size": 32, "dropout": 0.3, "epochs_top": 1, "iterations_top": 2, "batch_size_top": 1024, "learning_rate_top": 1e-05, "epochs_all": 1, "iterations_all": 1, "batch_size_all": 64, "learning_rate_all": 1e-05}
