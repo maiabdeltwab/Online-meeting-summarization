@@ -1,0 +1,418 @@
+﻿{% extends "app/layout.html" %} {% load static %} {% load friends_filter %} {% load group_user_filter %} {% block content %}
+
+
+<div class="profile-page">
+    <img src="{% static '/assets/img/dots.png'%}" class="dots">
+    <img src="{% static '/assets/img/path-4.png'%}" class="path">
+    <div class="">
+        <div class="page-header header-filter">
+            <div class="content p-t-170">
+                <div class="row">
+                    <div class="ml-auto col-xl-10 mr-auto">
+                        <div class="card card-coin card-plain">
+                            <div class="card-header">
+                                <div class="media-body">
+                                    <div class="imgcontainer">
+                                        {% if user2.user_profile.pic_path %}
+                                        <img class="img rounded-circle account-img" src="{{ user2.user_profile.pic_path.url }}" width="200" height="200"> {% else %}
+                                        <img class="img img-center img-fluid rounded-circle" src="{% static 'imgs/default_user_pic.png' %}" alt="My image"> {% endif %} {% if profile_owner %}
+                                        <div class="middle">
+                                            <div class="nav-item dropdown no-arrow">
+                                                <a class="nav-link dropdown-toggle identifyingClass" href="#" id="photoDropdown" data-id="1" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">              
+                                                  Change photo 
+                                                </a>
+                                                <!-- Dropdown - user photo -->
+                                                <div class="dropdown-menu dropdown-menu-custom shadow animated--grow-in" aria-labelledby="photoDropdown">
+                                                    <a href=# data-target="#imageModal" data-toggle="modal" class="dropdown-item" data-id="1">upload photo</a>
+                                                    <form action="{% url 'profile' user2.username %}" class="" method="post">
+                                                        {% csrf_token %}
+                                                        <input type="hidden" id="removePhoto" name="remove_photo" value="false">
+                                                        <button type="submit" class="dropdown-item" onclick="toTrue('#removePhoto')" id="remove">Remove</button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                    <a href="{% url 'profile' user2.username %}">
+                                        <h2 class="title text-info">{{ user2.first_name }} {{ user2.last_name }}</h2>
+                                    </a>
+                                    <p class="text-black-50"> @{{ user2.username }}</p>
+                                    <span class="h4 text-danger">email:</span> <span class="h4 text-dark">{{user2.email}}</span> {% if not profile_owner %}
+                                    <div class="col-lg-12 m-t-20" align="center">
+                                        {% if user2|is_friends:user %}
+                                        <div class="btn-group">
+                                            <button type="button" class="btn btn-success" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                <i class="mdi mdi-account-multiple-check m-r-10"></i>freinds
+                                            </button>
+                                            <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">         
+                                            </button>
+                                            <div class="dropdown-menu">
+                                                <a class="dropdown-item" href="" data-toggle="modal" data-target="#deleteFriendModal">
+                                                    <i class="mdi mdi-account-remove mr-2 text-warning h5"></i> unfriend
+                                                </a>
+                                                <a class="dropdown-item" href="" data-toggle="modal" data-target="#blockModal">
+                                                    <i class="mdi mdi-account-cancel mr-2 text-danger h5"></i> block user
+                                                </a>
+                                            </div>
+                                        </div>
+                                        {% elif user|sent_freind_request:user2 %}
+                                        <div class="btn-group">
+                                            <button type="button" class="btn btn-warning">
+                                             <i class="mdi mdi-account-arrow-right text-white"></i> request sent
+                                            </button>
+                                            <button type="button" class="btn btn-warning dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">         
+                                            </button>
+                                            <div class="dropdown-menu dropdown-menu-right p-2" aria-labelledby="optionsDropdown">
+                                                <form action="{% url 'profile' user2.username %}" method="post">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" id="cancelRequest" name="cancel_request" value="false">
+                                                    <button type="submit" class="dropdown-item" onclick="toTrue('#cancelRequest')" id="cancelRequestButton">
+                                                     <i class="mdi mdi-account-remove mr-2 text-warning h5"></i>
+                                                     cancel request
+                                                </button>
+                                                </form>
+                                                <a class="dropdown-item" href="" data-toggle="modal" data-target="#blockModal">
+                                                    <i class="mdi mdi-account-cancel mr-2 text-danger h5"></i> block user
+                                                </a>
+                                            </div>
+                                        </div>
+                                        {% elif user|receive_freind_request:user2 %}
+                                        <div class="btn-group">
+                                            <form action="{% url 'profile' user2.username %}" method="post">
+                                                {% csrf_token %}
+                                                <input type="hidden" id="confirmRequest" name="confirm_request" value="false">
+                                                <button type="submit" class="btn" onclick="toTrue('#confirmRequest')" id="confirmRequestButton">
+                                                  <i class="mdi mdi-account-check"></i> confirm
+                                                </button>
+                                            </form>
+                                            <button type="button" class="btn dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">         
+                                        </button>
+                                            <div class="dropdown-menu dropdown-menu-right p-2" aria-labelledby="optionsDropdown">
+                                                <form action="{% url 'profile' user2.username %}" method="post">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" id="deleteRequest" name="delete_request" value="false">
+                                                    <button type="submit" class="dropdown-item" onclick="toTrue('#deleteRequest')" id="deleteRequestButton">
+                                                   <i class="mdi mdi-account-remove mr-2 text-warning h5"></i>
+                                                     Delete request
+                                                </button>
+                                                </form>
+                                                <a class="dropdown-item" href="" data-toggle="modal" data-target="#blockModal">
+                                                    <i class="mdi mdi-account-cancel mr-2 text-danger h5"></i> block user
+                                                </a>
+                                            </div>
+                                        </div>
+                                        {% else %}
+                                        <div class="btn-group">
+                                            <form action="{% url 'profile' user2.username %}" method="post">
+                                                {% csrf_token %}
+                                                <input type="hidden" id="addFriend" name="add_friend" value="false">
+                                                <button type="submit" class="btn btn-info" onclick="toTrue('#addFriend')" id="sendRequest">
+                                                       <i class="mdi mdi-account-plus text-white"></i> add friend
+                                                    </button>
+                                            </form>
+                                            <button type="button" class="btn btn-info dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">         
+                                                </button>
+                                            <div class="dropdown-menu dropdown-menu-right p-2" aria-labelledby="optionsDropdown">
+                                                <a class="dropdown-item" href="" data-toggle="modal" data-target="#blockModal">
+                                                    <i class="mdi mdi-account-cancel mr-2 text-danger h5"></i> block user
+                                                </a>
+                                            </div>
+                                        </div>
+                                        {% endif %}
+
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="card-body m-b-20">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="main">
+            <div class="section section-basic m-b-100" id="basic-elements">
+                <div class="content">
+                    <div class="row">
+                        <div class="col-md-10 ml-auto col-xl-10 mr-auto">
+                            <div class="card">
+                                <div class="card-header">
+                                    <ul class="nav nav-tabs nav-tabs-primary justify-content-center" role="tablist" id="profileTab">
+                                        {% if profile_owner %}
+                                        <li class="nav-item active">
+                                            <a href="#groups" data-target="" data-toggle="tab" class="nav-link">Groups ({{user2.group_members.count}})</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="#friends" data-target="" data-toggle="tab" class="nav-link">friends ({{friends.count}})</a>
+                                        </li>
+                                        {% else %}
+                                        <li class="nav-item active">
+                                            <a href="#mfriends" data-target="" data-toggle="tab" class="nav-link">mutual friends ({{friends|mutual_friends:user}})</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="#mgroups" data-target="" data-toggle="tab" class="nav-link">mutual groups ({{user.group_members.all|mutual_groups:user2}})</a>
+                                        </li>
+                                        {% endif%}
+                                    </ul>
+                                    <div class="tab-content py-4">
+                                        <!---------- Groups tab content ----------->
+                                        <div class="tab-pane fade p-l-10 m-r-50" id="groups">
+                                            <div class="">
+                                                <div class="p-r-45 m-b-15" align="right">
+                                                    <a href="{% url 'creategroup' %}" class=""><i class="mdi mdi-plus-box"></i> create group</a>
+                                                </div>
+                                                <div class="m-l-30">
+                                                    {% for user_group in user.group_members.all %}
+                                                    <div class="row p-l-5 p-r-20">
+                                                        <div class="col-lg-10 m-l-50">
+                                                            <a class="d-flex align-items-center" href="{% url 'viewGroup' user_group.id %}">
+                                                                <div class="icon-circle mr-3">
+                                                                    {% if user_group.pic_path %}
+                                                                    <img class="image rounded-circle account-img" src="{{ user_group.pic_path.url  }}" alt="group image" width="50" height="50"> {% else %}
+                                                                    <img class="image rounded-circle account-img" src="{% static 'imgs/default_group_pic.png' %}" alt="group image" width="50" height="50"> {% endif %}
+                                                                </div>
+                                                                <div class="font-weight-bold">
+                                                                    <span class="font-weight-bold">{{user_group.name}}</span>
+                                                                </div>
+                                                            </a>
+                                                        </div>
+                                                        <form action="{% url 'profile' user.username 0 user_group.id %}" method="post">
+                                                            {% csrf_token %}
+                                                            <input type="hidden" id="leaveGroup" name="leave_group" value="false">
+                                                            <button type="submit" class="btn btn-danger" onclick="toTrue('#leaveGroup')" id="leave">Leave</button>
+                                                        </form>
+                                                        <hr class="col-lg-11 m-l-50 m-r-50">
+                                                    </div>
+                                                    {% endfor %}
+                                                </div>
+                                            </div>
+                                            <!--/row-->
+                                        </div>
+                                        <!---------- mutual Groups tab content ----------->
+                                        <div class="tab-pane fade p-l-10 m-r-50" id="mgroups">
+                                            <div class="">
+                                                <div class="m-l-30">
+                                                    {% for user_group in user.group_members.all %} {% if user_group|has_user:user2.id %}
+                                                    <div class="row p-l-5 p-r-20">
+                                                        <div class="col-lg-10 m-l-50">
+                                                            <a class="d-flex align-items-center" href="{% url 'viewGroup' user_group.id %}">
+                                                                <div class="icon-circle mr-3">
+                                                                    {% if user_group.pic_path %}
+                                                                    <img class="image rounded-circle account-img" src="{{ user_group.pic_path.url  }}" alt="group image" width="50" height="50"> {% else %}
+                                                                    <img class="image rounded-circle account-img" src="{% static 'imgs/default_group_pic.png' %}" alt="group image" width="50" height="50"> {% endif %}
+                                                                </div>
+                                                                <div class="font-weight-bold">
+                                                                    <span class="font-weight-bold">{{user_group.name}}</span>
+                                                                </div>
+                                                            </a>
+                                                        </div>
+                                                        <hr class="col-lg-11 m-l-50 m-r-50">
+                                                    </div>
+                                                    {% endif %} {% endfor %}
+                                                </div>
+                                            </div>
+                                            <!--/row-->
+                                        </div>
+                                        <!---------- friends tab content ----------->
+                                        <div class="tab-pane fade p-l-10 m-r-50" id="friends">
+                                            <div class="">
+                                                <div class="m-l-30">
+                                                    {% for friend in friends %}
+                                                    <div class="row p-l-5 p-r-20">
+                                                        <div class="col-lg-10 m-l-50">
+                                                            <a class="d-flex align-items-center" href="{% url 'profile' friend.user2.username %}">
+                                                                <div class="icon-circle mr-3">
+                                                                    {% if friend.user2.user_profile.pic_path %}
+                                                                    <img class="image rounded-circle account-img" src="{{ friend.user2.user_profile.pic_path.url  }}" alt="group image" width="50" height="50"> {% else %}
+                                                                    <img class="image rounded-circle account-img" src="{% static 'imgs/default_user_pic.png' %}" alt="group image" width="50" height="50"> {% endif %}
+                                                                </div>
+                                                                <div class="font-weight-bold">
+                                                                    <span class="font-weight-bold">{{friend.user2.first_name}} {{friend.user2.last_name}}</span>
+                                                                </div>
+                                                            </a>
+                                                        </div>
+                                                        <div class="text-black-50 p-t-10">
+                                                            <i class="mdi mdi-account-multiple text-gray"></i> freinds
+                                                        </div>
+                                                        <hr class="col-lg-11 m-l-50 m-r-50">
+                                                    </div>
+                                                    {% endfor %}
+                                                </div>
+                                            </div>
+                                            <!--/row-->
+                                        </div>
+                                        <!---------- mutual friends tab content ----------->
+                                        <div class="tab-pane fade p-l-10 m-r-50" id="mfriends">
+                                            <div class="">
+                                                <div class="m-l-30">
+                                                    {% for friend in friends %} {% if friend.user2|is_friends:user %}
+                                                    <div class="row p-l-5 p-r-20">
+                                                        <div class="col-lg-10 m-l-50">
+                                                            <a class="d-flex align-items-center" href="{% url 'profile' friend.user2.username %}">
+                                                                <div class="icon-circle mr-3">
+                                                                    {% if friend.user2.user_profile.pic_path %}
+                                                                    <img class="image rounded-circle account-img" src="{{ friend.user2.user_profile.pic_path.url  }}" alt="group image" width="50" height="50"> {% else %}
+                                                                    <img class="image rounded-circle account-img" src="{% static 'imgs/default_user_pic.png' %}" alt="group image" width="50" height="50"> {% endif %}
+                                                                </div>
+                                                                <div class="font-weight-bold">
+                                                                    <span class="font-weight-bold">{{friend.user2.first_name}} {{friend.user2.last_name}}</span>
+                                                                </div>
+                                                            </a>
+                                                        </div>
+                                                        <div class="text-black-50 p-t-15">
+                                                            <i class="mdi mdi-account-multiple text-gray"></i> freinds
+                                                        </div>
+                                                        <hr class="col-lg-11 m-l-50 m-r-50">
+                                                    </div>
+                                                    {% endif %} {% endfor %}
+                                                </div>
+                                            </div>
+                                            <!--/row-->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- popup panel (Modal) to change image-->
+<div class="main-modal">
+    <div class="modal fade" id="imageModal" tabindex="-1" role="dialog" aria-labelledby="imageModalLabel">
+        <div class="modal-dialog" role="dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="imageModelLabel">Change your profile photo</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                </div>
+                <div class="modal-body">
+                    <form action="." method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <input type="hidden" id="userPhoto" name="user_photo" value="false">
+                        <div class="input-group col-md-12 m-t-5 m-b-10">
+                            {{profile_form.pic_path}}
+                            <label class="custom-file-label text-black-50">Choose image</label>
+                        </div>
+                        <div class="modal-footer">
+                            <button id="close-modal" type="button" class="btn btn-default" data-dismiss="modal">cancel</button>
+                            <button type="submit" class="btn btn-primary" id="changePhoto" onclick="toTrue('#userPhoto')">Save</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- block friend Modal-->
+<div class="modal fade" id="blockModal" tabindex="-1" role="dialog" aria-labelledby="blockModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="blockModalLabel">Block user</h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span>
+            </button>
+            </div>
+            <div class="modal-body">Are you sure you want to block this user?</div>
+            <div class="modal-body"></div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                <form action="{% url 'profile' user2.username %}" class="" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" id="blockUser" name="block_user" value="false">
+                    <button type="submit" class="btn btn-danger" onclick="toTrue('#blockUser')" id="block">Block</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- delete friend Modal-->
+<div class="modal fade" id="deleteFriendModal" tabindex="-1" role="dialog" aria-labelledby="deleteFriendModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteFriendModalLabel">Unfriend</h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span>
+            </button>
+            </div>
+            <div class="modal-body">Are you sure you want to delete this user from friend list?</div>
+            <div class="modal-body"></div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                <form action="{% url 'profile' user2.username %}" class="" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" id="deleteFriend" name="delete_friend" value="false">
+                    <button type="submit" class="btn btn-danger" onclick="toTrue('#deleteFriend')" id="deleteFriendButton">unfriend</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- error file modal -->
+<div class="modal fade" id="errorModal" tabindex="-1" role="dialog" aria-labelledby="errorModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="errorModalLabel">Can't Read image</h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">×</span>
+          </button>
+            </div>
+            <div class="modal-body">Your image couldn't be uploaded, image should be saved as png,jpg,.. files.</div>
+            <div class="modal-body"></div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %} {% block scripts %}
+<script>
+    $(document).ready(function() {
+        $('a[data-toggle="tab"]').on('show.bs.tab', function(e) {
+            localStorage.setItem('activeTab', $(e.target).attr('href'));
+        });
+        var activeTab = localStorage.getItem('activeTab');
+        if (activeTab) {
+            $('#profileTab a[href="' + activeTab + '"]').tab('show');
+        }
+    });
+</script>
+<script>
+    $(function() {
+        $(".identifyingClass").click(function() {
+            $('.main-modal').show();
+            var my_id_value = $(this).data('id');
+            $(".modal-body #hiddenValue").val(my_id_value);
+        })
+    });
+</script>
+<script>
+    $(function() {
+        $("#close-modal").click(function() {
+            $('.main-modal').hide();
+        })
+    })
+</script>
+<script>
+    //the name of the file appear on select
+    $(".custom-file-input").on("change", function() {
+        var fileName = $(this).val().split("\\").pop();
+        $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+    });
+</script>
+<script>
+    function toTrue(element) {
+        $(element).val('true');
+    }
+</script>
+{% endblock %}

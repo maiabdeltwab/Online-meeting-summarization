@@ -1,2 +1,0 @@
-cx-Oracle==7.3.0
-Django==2.2.10

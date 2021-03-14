@@ -1,0 +1,329 @@
+﻿{% extends "app/layout.html" %} {% load static %} {% block content %}
+
+<div class="profile-page">
+    <img src="{% static '/assets/img/dots.png'%}" class="dots">
+    <img src="{% static '/assets/img/path-4.png'%}" class="path">
+    <div class="">
+        <div class="page-header header-filter">
+            <div class="content p-t-170">
+                <div class="row">
+                    <div class="ml-auto col-xl-10 mr-auto">
+                        <div class="row">
+                            <div class="card card-coin card-plain col-lg-6 m-l-20">
+                                <div class="card-header">
+                                    <div class="media-body">
+                                        <div class="imgcontainer">
+                                            {% if group.pic_path %}
+                                            <img class="img img-center img-fluid rounded-circle" src="{{ group.pic_path.url }}" alt="group image" width="160" height="160"> {% else %}
+                                            <img class="img img-center img-fluid rounded-circle" src="{% static 'imgs/default_group_pic.png' %}" alt="group image" width="160" height="160"> {% endif %} {% if group_owner %}
+                                            <div class="middle">
+                                                <div class="nav-item dropdown no-arrow">
+                                                    <a class="nav-link dropdown-toggle identifyingClass" href="#" id="photoDropdown" data-id="1" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">              
+                                                        Change photo 
+                                                     </a>
+                                                    <div class="dropdown-menu dropdown-menu-custom shadow animated--grow-in" aria-labelledby="photoDropdown">
+                                                        <a href=# data-target="#upload_modal" data-toggle="modal" class="dropdown-item" data-id="1">upload photo</a>
+                                                        <form action="{% url 'viewGroup' group.id %}" class="" method="post">
+                                                            {% csrf_token %}
+                                                            <input type="hidden" id="removePhoto" name="remove_photo" value="false">
+                                                            <button type="submit" class="dropdown-item" id="remove">Remove</button>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                        <a href="{% url 'viewGroup' group.id%}">
+                                            <h2 class="title text-info">{{ group.name }}</h2>
+                                        </a>
+                                        <p class="text-black-50"> created by: {{ group.creator.username }}</p>
+                                        <span class="h4 text-danger">description:</span> <span class="h4 text-dark">{{ group.description }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-5" align="left">
+                                {% if group_owner %}
+                                <div class="m-t-10">
+                                    <div class="btn-group">
+                                        <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                          options
+                                        </button>
+                                        <div class="dropdown-menu " aria-labelledby="optionsDropdown">
+                                            {% if not group.call_state %}
+                                            <a class="dropdown-item " href="{% url 'groupCall' group.id%} ">
+                                                <i class="mdi mdi-phone text-danger"></i> Start call
+                                            </a> {% else %}
+                                            <a class="dropdown-item " href="{% url 'groupCall' group.id%} ">
+                                                <i class="mdi mdi-phone text-danger"></i> Back to call
+                                            </a>
+                                            {% endif %}
+                                            <a class="dropdown-item " href="{% url 'upload_group_audio' group.id %} ">
+                                                <i class="mdi mdi-upload-outline text-danger"></i> Upload audio meeting
+                                            </a>
+                                            <a class="dropdown-item" href="" data-toggle="modal" data-target="#deleteModal">
+                                                <i class="mdi mdi-delete-empty text-danger"></i> delete group
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endif %} {% if not group_owner and group.call_state != 0 %}
+                                <div class="col-lg-2 m-t-50 " align="right ">
+                                    <div class="btn-group">
+                                        <button class="btn btn-danger" data-target="#inviteModal" data-toggle="modal">
+                                            <i class="fas fa-phone fa-sm fa-fw mr-2"></i>
+                                            Join call
+                                        </button>
+                                        <!-- <form action="{% url 'viewGroup' group.id %} " class=" " method="post">
+                                            {% csrf_token %}
+                                            <input type="hidden" id="joinCall" name="join_call" value="false">
+                                            <button type="submit" class="btn btn-danger" id="join">
+                                             <i class="fas fa-phone fa-sm fa-fw mr-2"></i>Join call</button>
+                                        </form> -->
+                                    </div>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="main">
+            <div class="section section-basic m-b-100 " id="basic-elements">
+                <div class="content ">
+                    <div class="row ">
+                        <div class="col-md-10 ml-auto col-xl-10 mr-auto ">
+                            <div class="card ">
+                                <div class="card-header">
+                                    <ul class="nav nav-tabs nav-tabs-primary justify-content-center" role="tablist" id="myTab">
+                                        <li class="nav-item active">
+                                            <a href="#members" data-target="" data-toggle="tab" class="nav-link">Members ({{group.members.count}})</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            {% if group_owner %}
+                                            <a href="#edit" data-target="" data-toggle="tab" class="nav-link">Edit info</a>
+                                        </li>
+                                        {% endif%}
+                                    </ul>
+                                    <div class="tab-content py-4">
+                                        <div class="tab-pane fade p-l-100" id="edit">
+                                            <form action="." method="post">
+                                                {% csrf_token %}
+                                                <input type="hidden" id="updateGroup" name="update_group" value="false">
+                                                <div class="form-group row ">
+                                                    <span class="col-lg-2 h4 text-black-50">Name</span>
+                                                    <div class="col-lg-9">
+                                                        {{form.name}}
+                                                    </div>
+                                                </div>
+                                                <div class="form-group row ">
+                                                    <span class="col-lg-2 h4 text-black-50">Description</span>
+                                                    <div class="col-lg-9">
+                                                        {{form.description}}
+                                                    </div>
+                                                </div>
+                                                <div class="form-group row p-r-10">
+                                                    <label class="col-lg-9 col-form-label form-control-label"></label>
+                                                    <div class="col-lg-3">
+                                                        <input type="submit" class="btn btn-primary" id="update" value="Save Changes">
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </div>
+                                        <div class="tab-pane fade p-l-10 m-r-50" id="members">
+                                            <div class="">
+                                                {% if group_owner %}
+                                                <div class="p-r-30 " align="right">
+                                                    <a href="{% url 'addGroupMembers' group.id %} " class="m-l-200 "><i class="mdi mdi-plus-box"></i>Add members</a>
+                                                </div>
+                                                {% endif %}
+                                                <div class="m-l-30"> {% for member in group.members.all %}
+                                                    <div class="row p-l-5 p-r-20">
+                                                        <div class="col-lg-10 m-l-50">
+                                                            <a class="dropdown-item d-flex align-items-center " href="{% url 'profile' member.username %} ">
+                                                                <div class="icon-circle mr-3">
+                                                                    {% if member.user_profile.pic_path %}
+                                                                    <img class="image rounded-circle account-img" src="{{ member.user_profile.pic_path.url }} " alt="user image " width="50 " height="50 "> {% else %}
+                                                                    <img class="image rounded-circle account-img" src="{% static 'imgs/default_user_pic.png' %} " alt="user image " width="50 " height="50 "> {% endif %}
+                                                                </div>
+                                                                <div>
+                                                                    <span class="font-weight-bold ">{{member.username}}</span>
+                                                                </div>
+                                                            </a>
+                                                        </div>
+                                                        {% if group_owner %} {% if member.id != group.creator.id %}
+                                                        <div class="">
+                                                            <form action="{% url 'viewGroupMember' group.id member.id %} " method="post">
+                                                                {% csrf_token %}
+                                                                <input type="hidden" id="removeUser" name="remove_user" value="false">
+                                                                <button type="submit" class="btn btn-danger" id="remove2">Remove</button>
+                                                            </form>
+                                                        </div>
+                                                        {% endif%} {% endif %}
+                                                        <hr class="col-lg-11 m-l-50 m-r-50">
+                                                    </div>
+                                                    {% endfor %}</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- popup panel (Modal) to change image-->
+<div class="main-modal ">
+    <div class="modal fade " id="upload_modal" tabindex="-1" role="dialog" aria-labelledby="upload_modalLabel">
+        <div class="modal-dialog " role="dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="uploadModalLabel">Change Group photo</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                </div>
+                <div class="modal-body">
+                    <form action="." method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <input type="hidden" id="updateGroupImg" name="update_group_img" value="false">
+                        <div class="input-group col-md-12 m-t-5 m-b-10">
+                            {{img_form.pic_path}}
+                            <label class="custom-file-label text-black-50">Choose image</label>
+                        </div>
+                        <div class="modal-footer">
+                            <button id="close-modal" type="button" class="btn btn-default" data-dismiss="modal">cancel</button>
+                            <button type="submit" class="btn btn-primary" id="updateImg">Save</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- delete Modal-->
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog " role="document ">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title " id="deleteModalLabel">Delete group</h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close ">
+            <span aria-hidden="true">×</span>
+            </button>
+            </div>
+            <div class="modal-body">Are you sure you want to delete this group?</div>
+            <div class="modal-body"></div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                <form action="{% url 'viewGroup' group.id %} " class="" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" id="removeGroup" name="remove_group" value="false">
+                    <button type="submit" class="btn btn-danger " id="remove3">Delete Group</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Invite Modal-->
+<div class="modal fade" id="inviteModal" tabindex="-1" role="dialog" aria-labelledby="inviteModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title text-danger" id="inviteModalLabel">Join call</h2>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                   <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="lead modal-body">
+                <div class="text-black h4">Please open your desktop application an enter this code to join call:</div>
+                <p class="text-info mb-5 h4" id="inviteCode">{{ group.invite_code }}</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-success" onclick="copyToClipboard('#inviteCode')">
+                    <i class="fas fa-copy fa-fw mr-2 text-gray-400"></i>Copy</button>
+                <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %} {% block scripts %}
+<script>
+    $(document).ready(function() {
+        $('a[data-toggle="tab"]').on('show.bs.tab', function(e) {
+            localStorage.setItem('activeTab', $(e.target).attr('href'));
+        });
+        var activeTab = localStorage.getItem('activeTab');
+        if (activeTab) {
+            $('#myTab a[href="' + activeTab + '"]').tab('show');
+        }
+    });
+</script>
+<script>
+    $('#update').click(function() {
+        $('#updateGroup').val('true');
+    });
+</script>
+<script>
+    $('#updateImg').click(function() {
+        $('#updateGroupImg').val('true');
+    });
+</script>
+<script>
+    $('#remove').click(function() {
+        $('#removePhoto').val('true');
+    });
+</script>
+<script>
+    $('#remove2').click(function() {
+        $('#removeUser').val('true');
+    });
+</script>
+<script>
+    $('#remove3').click(function() {
+        $('#removeGroup').val('true');
+    });
+</script>
+<script>
+    $('#join').click(function() {
+        $('#joinCall').val('true');
+    });
+</script>
+<script>
+    $(function() {
+        $(".identifyingClass").click(function() {
+            $('.main-modal').show();
+            var my_id_value = $(this).data('id');
+            $(".modal-body #hiddenValue ").val(my_id_value);
+        })
+    });
+</script>
+<script>
+    $(function() {
+        $("#close-modal").click(function() {
+            $('.main-modal').hide();
+        })
+    });
+</script>
+<script>
+    //the name of the file appear on select
+    $(".custom-file-input ").on("change ", function() {
+        var fileName = $(this).val().split("\\ ").pop();
+        $(this).siblings(".custom-file-label ").addClass("selected ").html(fileName);
+    });
+</script>
+<script>
+    function copyToClipboard(element) {
+        var $temp = $("<input>");
+        $("body").append($temp);
+        $temp.val($(element).text()).select();
+        $temp.focus(); //force focus
+        document.execCommand("copy");
+        $temp.remove();
+    }
+</script>
+{% endblock %}
