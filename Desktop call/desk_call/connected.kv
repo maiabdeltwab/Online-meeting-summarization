@@ -1,0 +1,99 @@
+#:include incall.kv
+#:include login.kv
+
+<Connected>:
+    BoxLayout:
+        orientation:'vertical'
+        #padding:200, 80, 200, 80
+        canvas.before:
+            Rectangle:
+                pos: self.pos
+                size: self.size
+                source:'imgs/bg.png'
+        AnchorLayout:
+            anchor_x:'center'
+            anchor_y:'top'
+            GridLayout:
+                rows: 1
+                cols: 2
+                size_hint: 1, .07
+                canvas:
+                    Color:
+                        rgba: .03, .56, .74, 1
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
+                BoxLayout:
+                    orientation:'horizontal'
+                    padding:20, 10, 20, 10
+                    
+                    Label:
+                        text:'Meetapp '
+                        text_size: self.size
+                        halign:'left'
+                        valign: 'middle'
+
+
+                BoxLayout:
+                    orientation:'horizontal'
+                    padding: 30, 0, 10, 0
+                    Button:
+                        text:'Log out'
+                        halign:'right'
+                        background_color: (0,0,0,0)
+                        on_press: root.disconnect()
+
+    BoxLayout:
+        orientation:'vertical'
+        padding:200, 80, 200, 80
+        BoxLayout:
+            orientation:'vertical'
+            canvas:
+                Color:
+                    rgba: 29,140,248,1   
+                RoundedRectangle:
+                    pos: self.pos
+                    size: self.size
+            BoxLayout:
+                orientation:'vertical'
+                size_hint: 1, .3
+                canvas:
+                    Color:
+                        rgba: .03, .56, .74, 1
+                    RoundedRectangle:
+                        size: self.size
+                        pos: self.pos
+                BoxLayout:
+                    orientation:'vertical'
+                    padding:0,10,0,10
+                    Label:
+                        text:'Join The Call'
+                        font_size:30
+            BoxLayout:
+                orientation:'vertical'
+                padding:150, 150, 150, 150
+                spacing:25
+                BoxLayout:
+                    size_hint: 1, .01
+                    TextInput:
+                        id:code
+                        padding: 15, 15, 15, 5
+                        hint_text: 'Invitation Code'
+                        font_size:15
+                        write_tab:False
+                        multiline: False
+                        background_color:(0,0,0,.05)
+                BoxLayout:
+                    size_hint: 1, .01
+                    canvas:
+                        Color:
+                            rgba: .03, .56, .74, 1
+                        RoundedRectangle:
+                            pos: self.pos
+                            size: self.size
+                            radius: (05.0, 05.0), (05.0, 05.0), (05.0, 05.0), (05.0, 05.0)
+                    Button:
+                        text:'Connect'
+                        background_color: (1, 1, 1, 0)
+                        on_press: root.connect(code.text)    
+           
